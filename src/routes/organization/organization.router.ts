@@ -28,6 +28,12 @@ organizationRouter.get("/", async (request: Request, response: Response) => {
 organizationRouter.get("/:id", async (request: Request, response: Response) => {
   const id = request.params.id;
   
+  const user = await getAuthUser(request, response)
+
+  if (!user) {
+    return response.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const organization = await OrganizationService.getOrganization(id);
     if (organization) {
