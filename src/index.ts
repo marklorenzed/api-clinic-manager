@@ -16,9 +16,14 @@ async function main() {
     app.listen(PORT, () => {
       console.log(`Running on Port ${PORT}`);
     });
+
+    return app;
   } catch (error) {
     console.log(error);
   }
 }
 
-main();
+const app = main();
+
+module.exports = app;
+
