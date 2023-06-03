@@ -51,4 +51,4 @@ app.listen(PORT, () => {
   console.log("[INFO] Server Running on port:", PORT);
 });
 
-module.exports = app;
+export default app
