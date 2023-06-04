@@ -1,40 +1,24 @@
 import express from "express";
 import type { Request, Response } from "express";
-
 import * as OrganizationService from "./organization.service";
-import { Organization } from "@prisma/client";
-import { createClient } from "@supabase/supabase-js";
-import getAuthUser from "../../utils/getAuthUser";
+import { AuthRequest } from "routes/middleware/auth";
 
 export const organizationRouter = express.Router();
 
 
 // GET: List of All Organizations
-organizationRouter.get("/", async (request: Request, response: Response) => {
-  const user = await getAuthUser(request, response)
-
-  if (!user) {
-    return response.status(401).json({ message: "Unauthorized" });
-  }
-
+organizationRouter.get("/", async (request: AuthRequest, response: Response) => {
   try {
-    const organizations = await OrganizationService.listOrganizations(user);
+    const organizations = await OrganizationService.listOrganizations(request.user.id);
     return response.status(200).json(organizations);
   } catch (error) {
     return response.status(500).json(error.message);
   }
 });
 
-organizationRouter.get("/:id", async (request: Request, response: Response) => {
-  const id = request.params.id;
-  
-  const user = await getAuthUser(request, response)
-
-  if (!user) {
-    return response.status(401).json({ message: "Unauthorized" });
-  }
-
+organizationRouter.get("/:id", async (request: AuthRequest, response: Response) => {
   try {
+    const id = request.params.id;
     const organization = await OrganizationService.getOrganization(id);
     if (organization) {
       return response.status(200).json(organization);
@@ -45,21 +29,14 @@ organizationRouter.get("/:id", async (request: Request, response: Response) => {
   }
 });
 
-organizationRouter.post("/", async (request: Request, response: Response) => {
-  const user = await getAuthUser(request, response)
-
-  if (!user) {
-    return response.status(401).json({ message: "Unauthorized" });
-  }
-
+organizationRouter.post("/", async (request: AuthRequest, response: Response) => {
   try {
     const { name, address } = request.body;
-    console.log("here");
     if (typeof name === "string" && typeof address === "string") {
       const organization = await OrganizationService.createOrganization({
         name,
         address,
-        user: user,
+        user: request.user.id,
       });
 
       if (organization) {
