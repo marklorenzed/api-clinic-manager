@@ -27,7 +27,6 @@ const auth = async (
   try {
     if (typeof jwt === "string") {
       const { data: user } = await supabase.auth.getUser(jwt);
-      console.log("user: ",user.user)
       if (user?.user) request.user = user.user;
     }
   } catch (error) {
