@@ -1,7 +1,8 @@
 import express from "express";
-import type { Request, Response } from "express";
-import * as OrganizationService from "./organization.service";
+import type { Response } from "express";
+
 import { AuthRequest } from "routes/middleware/auth";
+import { createOrganization, getOrganization, listOrganizations } from "./organization.service";
 
 export const organizationRouter = express.Router();
 
@@ -9,7 +10,7 @@ export const organizationRouter = express.Router();
 // GET: List of All Organizations
 organizationRouter.get("/", async (request: AuthRequest, response: Response) => {
   try {
-    const organizations = await OrganizationService.listOrganizations(request.user.id);
+    const organizations = await listOrganizations(request.user.id);
     return response.status(200).json(organizations);
   } catch (error) {
     return response.status(500).json(error.message);
@@ -19,7 +20,7 @@ organizationRouter.get("/", async (request: AuthRequest, response: Response) => 
 organizationRouter.get("/:id", async (request: AuthRequest, response: Response) => {
   try {
     const id = request.params.id;
-    const organization = await OrganizationService.getOrganization(id);
+    const organization = await getOrganization(id);
     if (organization) {
       return response.status(200).json(organization);
     }
@@ -33,7 +34,7 @@ organizationRouter.post("/", async (request: AuthRequest, response: Response) =>
   try {
     const { name, address } = request.body;
     if (typeof name === "string" && typeof address === "string") {
-      const organization = await OrganizationService.createOrganization({
+      const organization = await createOrganization({
         name,
         address,
         user: request.user.id,

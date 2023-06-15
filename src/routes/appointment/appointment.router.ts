@@ -8,7 +8,11 @@ export const appointMentRouter = express.Router();
 // GET: List of All Appointments
 appointMentRouter.get("/", async (request: AuthRequest, response: Response) => {
   try {
-    const { organizationId } = request.body;
+    const { organizationId } = request.query
+    if (!organizationId || typeof organizationId !== 'string') {
+      return response.status(500).json("Invalid Organization provided");
+    }
+
     const appointment = await AppointmentService.list(organizationId);
     return response.status(200).json(appointment);
   } catch (error) {
